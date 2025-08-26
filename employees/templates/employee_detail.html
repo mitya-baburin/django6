@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ employee.first_name }} {{ employee.last_name }}</title>
+</head>
+<body>
+    <h1>{{ employee.first_name }} {{ employee.last_name }}</h1>
+    <p>Пол: {{ employee.get_gender_display }}</p>
+    <p>Стаж: {{ tenure_days }} дней</p>
+    
+    {% if first_image %}
+        <img src="{{ first_image.image.url }}" alt="Фото сотрудника">
+    {% endif %}
+    
+    <h3>Навыки:</h3>
+    <ul>
+        {% for skill, level in employee.skills.items %}
+            <li>{{ skill }}: {{ level }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Галерея изображений:</h3>
+    <ul>
+        {% for image in employee.images.all|slice:":1" %}
+            <img src="{{ image.image.url }}" alt="Фото {{ forloop.counter }}">
+        {% endfor %}
+    </ul>
+</body>
+</html>

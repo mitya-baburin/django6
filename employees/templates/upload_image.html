@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить изображение для {{ employee.first_name }} {{ employee.last_name }}</title>
+</head>
+<body>
+    <h1>Добавить изображение для {{ employee.first_name }} {{ employee.last_name }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Загрузить изображение</button>
+    </form>
+    <a href="{% url 'employee_detail' employee.id %}">Назад</a>
+</body>
+</html>

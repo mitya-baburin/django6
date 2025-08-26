@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная</title>
+</head>
+<body>
+    <h1>Описание проекта</h1>
+    <div>
+        <h2>Всего сотрудников: {{ total_employees }}</h2>
+        <h3>Последние сотрудники</h3>
+        {% for employee in recent_employees %}
+            <a href="{% url 'employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a><br>
+        {% endfor %}
+    </div>
+</body>
+</html>

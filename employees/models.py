@@ -1,5 +1,4 @@
 from django.db import models
-from django import forms  
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.exceptions import ValidationError
 
@@ -31,15 +30,14 @@ class Employee(AbstractUser):
     role = models.CharField(max_length=50, default='employee')
     desk = models.ForeignKey(Desk, on_delete=models.SET_NULL, null=True, blank=True)
 
-   
     groups = models.ManyToManyField(
         Group,
-        related_name="employees",  
+        related_name="employees",
         blank=True
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name="employees",  
+        related_name="employees",
         blank=True
     )
 
@@ -63,8 +61,3 @@ class Image(models.Model):
     def delete(self, *args, **kwargs):
         self.image.delete()
         super().delete(*args, **kwargs)
-
-class EmployeeForm(forms.ModelForm):
-    class Meta:
-        model = Employee
-        fields = '__all__'

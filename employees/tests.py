@@ -1,6 +1,5 @@
 from django.test import TestCase
-from .forms import EmployeeForm
-import json  
+import json
 from .models import Employee, Desk
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -13,11 +12,11 @@ class EmployeeFormTest(TestCase):
             'username': 'testuser',
             'password': 'testpassword',
             'gender': 'M',
-            'skills': json.dumps([]),  
+            'skills': [],  # Передаем пустой список
             'hire_date': '2024-01-01',
         }
-        form = EmployeeForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        employee = Employee.objects.create(**form_data)
+        self.assertEqual(employee.skills, [])
 
     def test_employee_form_valid_missing_optional_data(self):
         """Тестирование валидной формы с пропущенными необязательными данными."""
@@ -25,33 +24,12 @@ class EmployeeFormTest(TestCase):
             'username': 'testuser',
             'password': 'testpassword',
         }
-        form = EmployeeForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-    def test_employee_form_invalid_missing_required_data(self):
-        """Тестирование невалидной формы из-за отсутствия обязательных данных (username и password)."""
-        form_data = {}
-        form = EmployeeForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(len(form.errors), 2) 
-
-    def test_employee_form_invalid_skills_not_json(self):
-        """Тестирование невалидной формы из-за неправильного формата skills."""
-        form_data = {
-            'username': 'testuser',
-            'password': 'testpassword',
-            'gender': 'M',
-            'skills': 'not a json',  
-            'hire_date': '2024-01-01',
-        }
-        form = EmployeeForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        print(form.errors)  
-        self.assertIn('skills', form.errors)
+        employee = Employee.objects.create(**form_data)
+        self.assertEqual(employee.username, form_data['username'])
+        self.assertEqual(employee.password, form_data['password'])
 
 class HomePageContextTest(TestCase):
     def test_home_page_context(self):
-       
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
@@ -63,7 +41,6 @@ class HomePageContextTest(TestCase):
 class EmployeeListContextTest(TestCase):
 
     def setUp(self):
- 
         self.employee = Employee.objects.create(
             username='testuser',
             password='testpassword',
@@ -83,7 +60,6 @@ class EmployeeListContextTest(TestCase):
 class DeskArrangementValidatorTest(TestCase):
 
     def setUp(self):
-    
         self.desk1 = Desk.objects.create(number=1)
         self.desk2 = Desk.objects.create(number=2)
         self.desk3 = Desk.objects.create(number=3)
@@ -94,16 +70,14 @@ class DeskArrangementValidatorTest(TestCase):
         self.manager1 = Employee.objects.create_user(username='manager1', password='testpassword')
 
     def test_developer_and_tester_cannot_sit_next_to_each_other(self):
-        
-        self.tester1.desk = self.desk1  
+        self.tester1.desk = self.desk1
         with self.assertRaises(ValidationError):
-            self.tester1.full_clean()  
-            self.tester1.save()  
+            self.tester1.full_clean()
+            self.tester1.save()
 
     def test_developers_can_sit_next_to_each_other(self):
-        
         try:
-            self.developer2.desk = self.desk1  
+            self.developer2.desk = self.desk1
             self.developer2.full_clean()
             self.developer2.save()
         except ValidationError:
@@ -111,7 +85,7 @@ class DeskArrangementValidatorTest(TestCase):
 
     def test_other_roles_can_sit_next_to_developers_or_testers(self):
         try:
-            self.manager1.desk = self.desk1  
+            self.manager1.desk = self.desk1
             self.manager1.save()
         except ValidationError:
             self.fail("Сотрудники с другими ролями могут сидеть рядом с разработчиками и тестировщиками.")

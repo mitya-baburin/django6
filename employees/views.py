@@ -4,6 +4,16 @@ from .forms import ImageForm
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json  # Import json
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, BasePermission
+from rest_framework import generics
+from rest_framework import filters
+from rest_framework.permissions import AllowAny
+from .serializers import EmployeeSerializer, EmployeeDetailSerializer
+from rest_framework.decorators import permission_classes
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import EmployeeFilter
+
+
 
 def home(request):
     context = {
@@ -58,21 +68,6 @@ def upload_image(request, employee_id):
     }
     return render(request, 'upload_image.html', context)
 
-# employees/views.py
-
-from rest_framework import generics
-from rest_framework import filters
-from .models import Employee
-from .serializers import EmployeeSerializer, EmployeeDetailSerializer
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
-from rest_framework.decorators import permission_classes
-
-
-
-from django_filters.rest_framework import DjangoFilterBackend
-from .filters import EmployeeFilter
-
-
 class EmployeeList(generics.ListCreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
@@ -87,12 +82,6 @@ class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
 
-# employees/views.py
-
-from rest_framework import generics
-from .models import Employee
-from .serializers import EmployeeSerializer, EmployeeDetailSerializer
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny, BasePermission
 
 class IsVisitor(BasePermission):
     def has_permission(self, request, view):
